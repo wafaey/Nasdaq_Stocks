@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import { useAppState } from "../../store";
+import { useAppState, useActions } from "../../store";
 import { TickerStatistics, TickerInfo } from "../../store/state";
 
 const LoadingContainer = styled.div`
@@ -52,12 +52,17 @@ const linkStyle = {
 
 const StockDetails = () => {
   const state = useAppState();
+  const actions = useActions();
   const [tickerDetails, setTickerDetails] = React.useState<TickerStatistics>(
     state.tickerStatistics
   );
   const [tickerInfo, setTickerInfo] = React.useState<TickerInfo>(
     state.tickerInfo
   );
+  React.useEffect(() => {
+    setTickerDetails(state.tickerStatistics);
+    setTickerInfo(state.tickerInfo);
+  }, [state.tickerStatistics, state.tickerInfo, state.isLoading, actions]);
   return (
     <>
       {state.isLoading ? (
