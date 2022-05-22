@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { Ticker } from "../../store/state";
 
 const StockContainer = styled.li`
-  width: 100%;
+  width: 98%;
   display: flex;
   flex-direction: column;
   margin: 1%;
@@ -29,4 +29,8 @@ const StocksList = ({ tickers, getTicker }: Props) => {
   );
 };
 
-export default StocksList;
+function areEqual(prevProps: Props, nextProps: Props) {
+  return prevProps.tickers === nextProps.tickers;
+}
+
+export default React.memo(StocksList, areEqual);

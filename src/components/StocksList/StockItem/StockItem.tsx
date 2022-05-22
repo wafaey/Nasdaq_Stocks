@@ -19,8 +19,12 @@ type Props = {
 
 const StockItem = ({ ticker, getTicker }: Props) => {
   return (
-    <Link to={"/details"} style={linkStyle} onClick={() => {}}>
-      <DetailsContainer>
+    <Link
+      to={"/details"}
+      style={linkStyle}
+      onClick={() => getTicker(ticker.ticker)}
+    >
+      <DetailsContainer className="stock-item">
         <span>{ticker.ticker}</span>
         <span>{ticker.name}</span>
       </DetailsContainer>
@@ -28,4 +32,8 @@ const StockItem = ({ ticker, getTicker }: Props) => {
   );
 };
 
-export default StockItem;
+function areEqual(prevProps: Props, nextProps: Props) {
+  return prevProps.ticker === nextProps.ticker;
+}
+
+export default React.memo(StockItem, areEqual);
