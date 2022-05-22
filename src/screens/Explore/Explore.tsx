@@ -45,23 +45,18 @@ const Explore = () => {
 
   const handleScroll = () => {
     if (
-      window.innerHeight + document.documentElement.scrollTop ===
+      window.innerHeight + document.documentElement.scrollTop >=
       document.documentElement.offsetHeight
     ) {
-      actions.setIsLoading(true);
+      actions.loadTickers();
     }
   };
 
   React.useEffect(() => {
-    if (state.tickers.length > 0 && !state.isLoading) {
+    if (state.tickers.length > 0) {
       setTickers(state.tickers);
-    } else if (
-      state.isLoading ||
-      (state.isLoading && state.tickers.length === 0)
-    ) {
-      actions.loadTickers();
     }
-  }, [actions, state.tickers, state.isLoading]);
+  }, [state.tickers]);
 
   React.useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -76,12 +71,12 @@ const Explore = () => {
   }, [searchText]);
 
   React.useEffect(() => {
-    if (runOnce.current === false) {
+    if (runOnce.current === false && state.tickers.length === 0) {
       runOnce.current = true;
-      actions.setIsLoading(true);
-      window.addEventListener("scroll", handleScroll);
-      return () => window.removeEventListener("scroll", handleScroll);
+      actions.loadTickers();
     }
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
