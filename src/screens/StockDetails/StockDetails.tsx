@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import { useAppState, useActions } from "../../store";
+import { useAppState } from "../../store";
 import { TickerStatistics, TickerInfo } from "../../store/state";
 
 const LoadingContainer = styled.div`
@@ -50,19 +50,24 @@ const linkStyle = {
   color: "black",
 };
 
+type TickerDetails = {
+  tickerStatistics: TickerStatistics;
+  tickerInfo: TickerInfo;
+};
+
 const StockDetails = () => {
   const state = useAppState();
-  const actions = useActions();
-  const [tickerDetails, setTickerDetails] = React.useState<TickerStatistics>(
-    state.tickerStatistics
-  );
-  const [tickerInfo, setTickerInfo] = React.useState<TickerInfo>(
-    state.tickerInfo
-  );
+  const [tickerDetails, setTickerDetails] = React.useState<TickerDetails>({
+    tickerStatistics: state.tickerStatistics,
+    tickerInfo: state.tickerInfo,
+  });
   React.useEffect(() => {
-    setTickerDetails(state.tickerStatistics);
-    setTickerInfo(state.tickerInfo);
-  }, [state.tickerStatistics, state.tickerInfo, state.isLoading, actions]);
+    setTickerDetails({
+      tickerStatistics: state.tickerStatistics,
+      tickerInfo: state.tickerInfo,
+    });
+  }, [state.tickerStatistics, state.tickerInfo]);
+
   return (
     <>
       {state.isLoading ? (
@@ -71,8 +76,8 @@ const StockDetails = () => {
         <MainContainer>
           <HeadContainer>
             <div>
-              <p>{tickerDetails.T}</p>
-              <span>{tickerDetails.l}</span>
+              <p>{tickerDetails.tickerStatistics.T}</p>
+              <span>{tickerDetails.tickerStatistics.l}</span>
             </div>
             <Link to={"/"} style={linkStyle}>
               <button>Back</button>
@@ -84,23 +89,23 @@ const StockDetails = () => {
               {" "}
               <div>
                 <DetailName>Close</DetailName>
-                <span> {tickerDetails.c}</span>
+                <span> {tickerDetails.tickerStatistics.c}</span>
               </div>
               <div>
                 <DetailName>Open</DetailName>
-                <span> {tickerDetails.o} </span>
+                <span> {tickerDetails.tickerStatistics.o} </span>
               </div>{" "}
               <div>
                 <DetailName>High</DetailName>
-                <span> {tickerDetails.h}</span>{" "}
+                <span> {tickerDetails.tickerStatistics.h}</span>{" "}
               </div>{" "}
               <div>
                 <DetailName>Low</DetailName>
-                <span> {tickerDetails.l}</span>
+                <span> {tickerDetails.tickerStatistics.l}</span>
               </div>{" "}
               <div>
                 <DetailName>Volume</DetailName>
-                <span> {tickerDetails.v}</span>
+                <span> {tickerDetails.tickerStatistics.v}</span>
               </div>
             </ValuesContainer>
           </DetailsContainer>
@@ -109,7 +114,7 @@ const StockDetails = () => {
               {" "}
               <h2>About</h2>
               <a
-                href={tickerInfo.homepage_url}
+                href={tickerDetails.tickerInfo.homepage_url}
                 rel="noreferrer"
                 target="_blank"
               >
@@ -120,12 +125,12 @@ const StockDetails = () => {
             <ValueContainer>
               {" "}
               <h3>Industry </h3>
-              <p>{tickerInfo.name}</p>
+              <p>{tickerDetails.tickerInfo.name}</p>
             </ValueContainer>
             <ValueContainer>
               {" "}
               <h3>Description</h3>
-              <p>{tickerInfo.description}</p>
+              <p>{tickerDetails.tickerInfo.description}</p>
             </ValueContainer>
           </DetailsContainer>
         </MainContainer>
