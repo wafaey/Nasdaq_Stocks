@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useRef } from "react";
 import styled from "styled-components";
 import StocksList from "../../components/StocksList";
 import SearchInput from "../../components/SearchInput";
-import { useAppState } from "../../store";
+import { useAppState, useActions } from "../../store";
 import { Ticker } from "../../store/state";
 
 const SearchContainer = styled.section`
@@ -19,10 +19,15 @@ const LoadingContainer = styled.div`
 `;
 const Explore = () => {
   const state = useAppState();
+  const actions = useActions();
+  const runOnce = useRef(false);
   const [tickers, setTickers] = React.useState<Ticker[]>([]);
   const [searchText, setSearchText] = React.useState("");
 
-  const getTicker = (ticker: string) => {};
+  const getTicker = (ticker: string) => {
+    actions.setIsLoading(true);
+    actions.getTickerDetails(ticker);
+  };
 
   const handleSearch = React.useCallback(
     (text: string) => {
@@ -38,6 +43,26 @@ const Explore = () => {
     [tickers]
   );
 
+  const handleScroll = () => {
+    if (
+      window.innerHeight + document.documentElement.scrollTop ===
+      document.documentElement.offsetHeight
+    ) {
+      actions.setIsLoading(true);
+    }
+  };
+
+  React.useEffect(() => {
+    if (state.tickers.length > 0 && !state.isLoading) {
+      setTickers(state.tickers);
+    } else if (
+      state.isLoading ||
+      (state.isLoading && state.tickers.length === 0)
+    ) {
+      actions.loadTickers();
+    }
+  }, [actions, state.tickers, state.isLoading]);
+
   React.useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (searchText) {
@@ -50,6 +75,15 @@ const Explore = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchText]);
 
+  React.useEffect(() => {
+    if (runOnce.current === false) {
+      runOnce.current = true;
+      actions.setIsLoading(true);
+      window.addEventListener("scroll", handleScroll);
+      return () => window.removeEventListener("scroll", handleScroll);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <>
       <SearchContainer>
@@ -60,7 +94,7 @@ const Explore = () => {
           type={"text"}
         />
       </SearchContainer>
-      <section id="stocks">
+      <section className="stocks-list">
         {" "}
         <StocksList tickers={tickers} getTicker={getTicker} />
       </section>
